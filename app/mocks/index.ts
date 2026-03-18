@@ -1,0 +1,43 @@
+export const PLATFORM_DATA = {
+  data: [
+    {
+      id: "1",
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PA",
+      name: "Platform A",
+      description: "Core integration hub for syncing data across internal services.",
+      status: "Synced",
+      lastSynced: new Date().toISOString(),
+      lastSyncDuration: 120,
+      version: "1.0.0",
+    },
+    {
+      id: "2",
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PB",
+      name: "Platform B",
+      description: "Real-time message broker for event-driven pipelines.",
+      status: "Syncing",
+      lastSynced: new Date().toISOString(),
+      lastSyncDuration: 45,
+      version: "2.0.0",
+    },
+    {
+      id: "3",
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PC",
+      name: "Platform C",
+      description: "Legacy ERP connector with scheduled batch sync.",
+      status: "Conflict",
+      lastSynced: new Date(Date.now() - 3600000).toISOString(),
+      lastSyncDuration: 300,
+      version: "0.9.4",
+    },
+    {
+      id: "4",
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PD",
+      name: "Platform D",
+      description: "External payment gateway integration.",
+      status: "Error",
+      lastSynced: new Date(Date.now() - 7200000).toISOString(),
+      version: "3.1.2",
+    },
+  ],
+};
