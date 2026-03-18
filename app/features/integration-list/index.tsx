@@ -1,4 +1,3 @@
-import { useFetchPlatforms } from "~/api";
 import { EmptyState } from "~/components/empty-state";
 import { ErrorState } from "~/components/error-state";
 import { PlatformCard } from "~/features/integration-list/platform-card";
@@ -7,6 +6,7 @@ import { Spinner } from "~/components/spinner";
 import { StatusFilter } from "~/features/integration-list/status-filter";
 import type { Status } from "~/entities/types";
 import { useFilter } from "~/utils/filter";
+import { useFetchPlatforms } from "~/api/fetch-platforms";
 
 export const IntegrationList = () => {
   const [filter, setFilter] = useFilter<{ search: string; status: Status | null }>({
