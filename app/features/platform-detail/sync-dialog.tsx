@@ -149,7 +149,7 @@ export function SyncDialog({
 
           <div className="flex flex-col gap-2">
             {platformChanges.map((change) => {
-              const accepted = !!acceptedChangeIds[change.id];
+              const accepted = Object.hasOwn(acceptedChangeIds, change.id);
               return (
                 <label
                   key={change.id}

@@ -46,7 +46,7 @@ export function SyncAction({ platform }: SyncActionProps) {
           <Button
             variant="outlined"
             size="sm"
-            onClick={() => send({ type: "SYNC", applicationId: platform.applicationId })}
+            onClick={() => send({ type: "SYNC", applicationId: platform.id })}
             className="flex items-center gap-1.5 border-yellow-300 text-yellow-700 hover:bg-yellow-50"
           >
             <ShieldAlert size={14} />
@@ -60,7 +60,7 @@ export function SyncAction({ platform }: SyncActionProps) {
           variant="solid"
           size="sm"
           disabled={state.matches("syncing")}
-          onClick={() => send({ type: "SYNC", applicationId: platform.applicationId })}
+          onClick={() => send({ type: "SYNC", applicationId: platform.id })}
           className="flex items-center gap-1.5"
         >
           <RefreshCw size={14} className={state.matches("syncing") ? "animate-spin" : ""} />
@@ -77,7 +77,7 @@ export function SyncAction({ platform }: SyncActionProps) {
           error={syncError || undefined}
           onClose={() => send({ type: "CLOSE" })}
           onSubmit={() => send({ type: "CONFIRM" })}
-          onRetry={() => send({ type: "RETRY", applicationId: platform.applicationId })}
+          onRetry={() => send({ type: "RETRY", applicationId: platform.id })}
         />
       )}
 
@@ -90,7 +90,7 @@ export function SyncAction({ platform }: SyncActionProps) {
           error={syncError || undefined}
           onClose={() => send({ type: "CLOSE" })}
           onSubmit={() => send({ type: "CONFIRM" })}
-          onRetry={() => send({ type: "RETRY", applicationId: platform.applicationId })}
+          onRetry={() => send({ type: "RETRY", applicationId: platform.id })}
         />
       )}
     </>

@@ -3,53 +3,69 @@ import type { SyncHistoryEntry } from "~/entities/types";
 export const PLATFORM_DATA = {
   data: [
     {
-      id: "1",
-      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PA",
-      name: "Platform A",
+      id: "salesforce" as const,
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=SF",
+      name: "Salesforce",
       description: "Core integration hub for syncing data across internal services.",
       status: "Synced",
-      applicationId: "salesforce",
       lastSynced: new Date().toISOString(),
       lastSyncDuration: 120,
       version: "1.0.0",
     },
     {
-      id: "2",
-      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PB",
-      name: "Platform B",
+      id: "hubspot" as const,
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=HS",
+      name: "HubSpot",
       description: "Real-time message broker for event-driven pipelines.",
       status: "Syncing",
-      applicationId: "stripe",
       lastSynced: new Date().toISOString(),
       lastSyncDuration: 45,
       version: "2.0.0",
     },
     {
-      id: "3",
-      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PC",
-      name: "Platform C",
-      description: "Legacy ERP connector with scheduled batch sync.",
+      id: "stripe" as const,
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=ST",
+      name: "Stripe",
+      description: "External payment gateway integration.",
       status: "Conflict",
-      applicationId: "stripe",
       lastSynced: new Date(Date.now() - 3600000).toISOString(),
       lastSyncDuration: 300,
       version: "0.9.4",
     },
     {
-      id: "4",
-      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=PD",
-      name: "Platform D",
-      description: "External payment gateway integration.",
+      id: "slack" as const,
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=SL",
+      name: "Slack",
+      description: "Team communication and notification relay.",
       status: "Error",
-      applicationId: "slack",
       lastSynced: new Date(Date.now() - 7200000).toISOString(),
       version: "3.1.2",
+    },
+    {
+      id: "zendesk" as const,
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=ZD",
+      name: "Zendesk",
+      description: "Customer support ticket synchronization.",
+      status: "Synced",
+      lastSynced: new Date(Date.now() - 1800000).toISOString(),
+      lastSyncDuration: 60,
+      version: "4.2.1",
+    },
+    {
+      id: "intercom" as const,
+      avatar: "https://api.dicebear.com/9.x/initials/svg?seed=IC",
+      name: "Intercom",
+      description: "Live chat and customer engagement platform.",
+      status: "Synced",
+      lastSynced: new Date(Date.now() - 900000).toISOString(),
+      lastSyncDuration: 30,
+      version: "1.5.0",
     },
   ],
 };
 
 export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
-  "1": [
+  salesforce: [
     {
       id: "sh-1a",
       timestamp: "2026-03-02T07:15:00.000Z",
@@ -86,7 +102,7 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       ],
     },
   ],
-  "2": [
+  hubspot: [
     {
       id: "sh-2a",
       timestamp: "2026-03-01T12:00:00.000Z",
@@ -112,7 +128,7 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       ],
     },
   ],
-  "3": [
+  stripe: [
     {
       id: "sh-3a",
       timestamp: "2026-03-02T10:30:00.000Z",
@@ -141,7 +157,7 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       changes: [{ id: "c8", field_name: "sku", change_type: "ADD", new_value: "SKU-9921" }],
     },
   ],
-  "4": [
+  slack: [
     {
       id: "sh-4a",
       timestamp: "2026-03-01T09:00:00.000Z",

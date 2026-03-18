@@ -17,7 +17,6 @@ export const PlatformSchema = z.object({
   version: z.string(),
   lastSynced: z.iso.datetime(),
   lastSyncDuration: z.number().optional(),
-  applicationId: z.string(),
 });
 
 export const FetchPlatformsRequestSchema = z.object({

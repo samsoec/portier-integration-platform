@@ -3,23 +3,12 @@ import { Dialog } from "~/components/ui/dialog";
 import { Badge } from "~/components/badge";
 import type { BadgeProps } from "~/components/badge";
 import type { SyncChange, SyncHistoryEntry, ChangeType } from "~/entities/types";
+import { EmptyState } from "~/components/empty-state";
 
 const CHANGE_TYPE_BADGE: Record<ChangeType, BadgeProps["variant"]> = {
   UPDATE: "info",
   ADD: "success",
   DELETE: "error",
-};
-
-const TEXT_STYLES: Record<ChangeType, string> = {
-  UPDATE: "text-gray-900",
-  ADD: "text-green-700",
-  DELETE: "text-red-600 line-through",
-};
-
-const CONTAINER_STYLES: Record<ChangeType, string> = {
-  UPDATE: "border-blue-200 bg-blue-50/50",
-  ADD: "border-green-300 bg-green-50/50",
-  DELETE: "border-red-300 bg-red-50/50",
 };
 
 type SyncDetailDialogProps = {
@@ -44,7 +33,7 @@ export function SyncDetailDialog({ entry, onClose }: SyncDetailDialogProps) {
         </div>
 
         {entry.changes.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400">No change data available.</p>
+          <EmptyState title="No Changes" description="This sync did not result in any changes." />
         )}
 
         {entry.changes.length > 0 && (
@@ -69,6 +58,18 @@ export function SyncDetailDialog({ entry, onClose }: SyncDetailDialogProps) {
     </Dialog>
   );
 }
+
+const TEXT_STYLES: Record<ChangeType, string> = {
+  UPDATE: "text-gray-900",
+  ADD: "text-green-700",
+  DELETE: "text-red-600 line-through",
+};
+
+const CONTAINER_STYLES: Record<ChangeType, string> = {
+  UPDATE: "border-blue-200 bg-blue-50/50",
+  ADD: "border-green-300 bg-green-50/50",
+  DELETE: "border-red-300 bg-red-50/50",
+};
 
 function ChangeValue({ change }: { change: SyncChange }) {
   return (
