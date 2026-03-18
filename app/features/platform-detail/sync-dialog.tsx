@@ -129,21 +129,24 @@ export function SyncDialog({
               {platformChanges.length} changes selected
             </p>
             <div className="flex items-center gap-2">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleAcceptAll}
                 disabled={allSelected}
-                className="text-xs font-medium text-blue-600 hover:underline disabled:text-gray-400 disabled:no-underline"
+                className={cn("text-xs", allSelected && "opacity-50")}
               >
                 Select All
-              </button>
-              <span className="text-gray-300">|</span>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleRejectAll}
                 disabled={noneSelected}
-                className="text-xs font-medium text-blue-600 hover:underline disabled:text-gray-400 disabled:no-underline"
+                className={cn("text-xs", noneSelected && "opacity-50")}
               >
                 Deselect All
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -216,17 +219,25 @@ const CONTAINER_STYLES: Record<ChangeType, string> = {
 function ChangeValue({ change }: { change: SyncChange }) {
   return (
     <div className="grid grid-cols-2 gap-2">
-      <div className="flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors border-gray-200 bg-gray-50/50">
+      <div
+        className={cn(
+          "flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors",
+          CONTAINER_STYLES[change.change_type]
+        )}
+      >
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Current</span>
-        <span className={`text-sm ${TEXT_STYLES[change.change_type]}`}>
+        <span className={cn("text-sm", TEXT_STYLES[change.change_type])}>
           {change.current_value ?? <span className="italic text-gray-400">—</span>}
         </span>
       </div>
       <div
-        className={`flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors ${CONTAINER_STYLES[change.change_type]}`}
+        className={cn(
+          "flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors",
+          CONTAINER_STYLES[change.change_type]
+        )}
       >
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">New</span>
-        <span className={`text-sm ${TEXT_STYLES[change.change_type]}`}>
+        <span className={cn("text-sm", TEXT_STYLES[change.change_type])}>
           {change.new_value ?? <span className="italic text-gray-400">—</span>}
         </span>
       </div>

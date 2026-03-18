@@ -4,6 +4,7 @@ import { Badge } from "~/components/badge";
 import type { BadgeProps } from "~/components/badge";
 import type { SyncChange, SyncHistoryEntry, ChangeType } from "~/entities/types";
 import { EmptyState } from "~/components/empty-state";
+import { cn } from "~/utils/classname";
 
 const CHANGE_TYPE_BADGE: Record<ChangeType, BadgeProps["variant"]> = {
   UPDATE: "info",
@@ -74,17 +75,25 @@ const CONTAINER_STYLES: Record<ChangeType, string> = {
 function ChangeValue({ change }: { change: SyncChange }) {
   return (
     <div className="grid grid-cols-2 gap-2">
-      <div className="flex flex-col gap-1 rounded-lg border border-gray-200 bg-white p-3">
+      <div
+        className={cn(
+          "flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors",
+          CONTAINER_STYLES[change.change_type]
+        )}
+      >
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Current</span>
-        <span className={`text-sm ${TEXT_STYLES[change.change_type]}`}>
+        <span className={cn("text-sm", TEXT_STYLES[change.change_type])}>
           {change.current_value ?? <span className="italic text-gray-400">—</span>}
         </span>
       </div>
       <div
-        className={`flex flex-col gap-1 rounded-lg border p-3 ${CONTAINER_STYLES[change.change_type]}`}
+        className={cn(
+          "flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors",
+          CONTAINER_STYLES[change.change_type]
+        )}
       >
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">New</span>
-        <span className={`text-sm ${TEXT_STYLES[change.change_type]}`}>
+        <span className={cn("text-sm", TEXT_STYLES[change.change_type])}>
           {change.new_value ?? <span className="italic text-gray-400">—</span>}
         </span>
       </div>

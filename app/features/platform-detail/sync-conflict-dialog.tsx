@@ -1,4 +1,4 @@
-import { CheckCircleIcon, RefreshCw } from "lucide-react";
+import { Check, CheckCircleIcon, Circle, RefreshCw } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Dialog } from "~/components/ui/dialog";
 import { Badge } from "~/components/badge";
@@ -147,24 +147,31 @@ export function SyncConflictDialog({
               <span className="font-semibold text-gray-900">{numberAccepted}</span> of{" "}
               {platformChanges.length} conflicts resolved
             </p>
-            <div className="flex items-center gap-2">
-              <button
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleKeepAllCurrent}
                 disabled={allCurrentSelected}
-                className="text-xs font-medium text-blue-600 hover:underline disabled:text-gray-400 disabled:no-underline"
+                className={cn("text-xs", allCurrentSelected && "opacity-50")}
               >
                 Keep All Current
-              </button>
-              <span className="text-gray-300">|</span>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleAcceptAllNew}
                 disabled={allNewSelected}
-                className="text-xs font-medium text-blue-600 hover:underline disabled:text-gray-400 disabled:no-underline"
+                className={cn("text-xs", allNewSelected && "opacity-50")}
               >
                 Accept All New
-              </button>
+              </Button>
             </div>
           </div>
+
+          <p className="text-xs text-gray-400">
+            Click on the value you want to keep for each field.
+          </p>
 
           <div className="flex flex-col gap-3">
             {platformChanges.map((change) => {
@@ -174,10 +181,18 @@ export function SyncConflictDialog({
               const acceptedCurrent =
                 Object.hasOwn(acceptedChangeIds, change.id) &&
                 acceptedChangeIds[change.id] === change.current_value;
+              const hasSelection = acceptedNew || acceptedCurrent;
               return (
                 <div key={change.id} className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 justify-between">
-                    <code className="text-sm font-medium text-gray-900">{change.field_name}</code>
+                    <div className="flex items-center gap-2">
+                      {hasSelection ? (
+                        <Check size={14} className="text-green-500" />
+                      ) : (
+                        <Circle size={14} className="text-gray-300" />
+                      )}
+                      <code className="text-sm font-medium text-gray-900">{change.field_name}</code>
+                    </div>
                     <Badge variant={CHANGE_TYPE_BADGE[change.change_type]}>
                       {change.change_type}
                     </Badge>
@@ -187,16 +202,36 @@ export function SyncConflictDialog({
                       type="button"
                       onClick={() => handleToggleChange(change.id, change.current_value)}
                       className={cn(
-                        "flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors",
+                        "relative flex flex-col gap-1 rounded-lg border p-3 text-left transition-all",
                         acceptedCurrent
-                          ? "border-blue-200 bg-blue-50/50 ring-1 ring-blue-500"
-                          : "border-gray-200 bg-gray-50/50 hover:border-blue-300"
+                          ? "border-blue-400 bg-blue-50 ring-2 ring-blue-400 shadow-sm"
+                          : hasSelection
+                            ? "border-gray-200 bg-gray-50/30 opacity-50 hover:opacity-80 hover:border-blue-300"
+                            : "border-gray-200 bg-gray-50/50 hover:border-blue-300 hover:bg-blue-50/30"
                       )}
                     >
-                      <span className="text-xs font-semibold uppercase tracking-wide text-blue-400">
-                        Current
-                      </span>
-                      <span className="text-sm text-gray-700">
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={cn(
+                            "text-xs font-semibold uppercase tracking-wide",
+                            acceptedCurrent ? "text-blue-600" : "text-gray-400"
+                          )}
+                        >
+                          Current
+                        </span>
+                        {acceptedCurrent && (
+                          <span className="flex items-center gap-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
+                            <Check size={10} />
+                            Keeping
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        className={cn(
+                          "text-sm",
+                          acceptedCurrent ? "font-medium text-gray-900" : "text-gray-700"
+                        )}
+                      >
                         {change.current_value ?? <span className="italic text-gray-400">—</span>}
                       </span>
                     </button>
@@ -204,16 +239,36 @@ export function SyncConflictDialog({
                       type="button"
                       onClick={() => handleToggleChange(change.id, change.new_value)}
                       className={cn(
-                        "flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors",
+                        "relative flex flex-col gap-1 rounded-lg border p-3 text-left transition-all",
                         acceptedNew
-                          ? "border-violet-500 bg-violet-50 ring-1 ring-violet-500"
-                          : "border-gray-200 bg-gray-50/50 hover:border-violet-300"
+                          ? "border-violet-400 bg-violet-50 ring-2 ring-violet-400 shadow-sm"
+                          : hasSelection
+                            ? "border-gray-200 bg-gray-50/30 opacity-50 hover:opacity-80 hover:border-violet-300"
+                            : "border-gray-200 bg-gray-50/50 hover:border-violet-300 hover:bg-violet-50/30"
                       )}
                     >
-                      <span className="text-xs font-semibold uppercase tracking-wide text-violet-500">
-                        New
-                      </span>
-                      <span className="text-sm text-gray-900">
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={cn(
+                            "text-xs font-semibold uppercase tracking-wide",
+                            acceptedNew ? "text-violet-600" : "text-gray-400"
+                          )}
+                        >
+                          New
+                        </span>
+                        {acceptedNew && (
+                          <span className="flex items-center gap-1 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-700">
+                            <Check size={10} />
+                            Accepting
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        className={cn(
+                          "text-sm",
+                          acceptedNew ? "font-medium text-gray-900" : "text-gray-700"
+                        )}
+                      >
                         {change.new_value ?? <span className="italic text-gray-400">—</span>}
                       </span>
                     </button>
