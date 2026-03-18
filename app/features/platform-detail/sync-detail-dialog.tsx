@@ -5,6 +5,8 @@ import type { BadgeProps } from "~/components/badge";
 import type { SyncChange, SyncHistoryEntry, ChangeType } from "~/entities/types";
 import { EmptyState } from "~/components/empty-state";
 import { cn } from "~/utils/classname";
+import { useMemo } from "react";
+import { groupChangesByEntity, parseFieldName } from "~/utils/group-changes";
 
 const CHANGE_TYPE_BADGE: Record<ChangeType, BadgeProps["variant"]> = {
   UPDATE: "info",
@@ -18,6 +20,7 @@ type SyncDetailDialogProps = {
 };
 
 export function SyncDetailDialog({ entry, onClose }: SyncDetailDialogProps) {
+  const grouped = useMemo(() => groupChangesByEntity(entry.changes), [entry.changes]);
   const footer = (
     <Button variant="ghost" onClick={onClose}>
       Close
@@ -38,19 +41,34 @@ export function SyncDetailDialog({ entry, onClose }: SyncDetailDialogProps) {
         )}
 
         {entry.changes.length > 0 && (
-          <div className="flex flex-col gap-2">
-            {entry.changes.map((change) => (
-              <div
-                key={change.id}
-                className="flex flex-col gap-1.5 rounded-lg border border-gray-200 bg-gray-50/50 p-3"
-              >
-                <div className="flex items-center gap-2 justify-between">
-                  <code className="text-sm font-medium text-gray-900">{change.field_name}</code>
-                  <Badge variant={CHANGE_TYPE_BADGE[change.change_type]}>
-                    {change.change_type}
-                  </Badge>
+          <div className="flex flex-col gap-4">
+            {grouped.map((group) => (
+              <div key={group.entity} className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+                    {group.entity}
+                  </h3>
+                  <p className="text-xs text-gray-500">{group.changes.length} changes conflict</p>
                 </div>
-                <ChangeValue change={change} />
+                <div className="flex flex-col gap-2">
+                  {group.changes.map((change) => {
+                    const { field } = parseFieldName(change.field_name);
+                    return (
+                      <div
+                        key={change.id}
+                        className="flex flex-col gap-1.5 rounded-lg border border-gray-200 bg-gray-50/50 p-3"
+                      >
+                        <div className="flex items-center gap-2 justify-between">
+                          <code className="text-sm font-medium text-gray-900">{field}</code>
+                          <Badge variant={CHANGE_TYPE_BADGE[change.change_type]}>
+                            {change.change_type}
+                          </Badge>
+                        </div>
+                        <ChangeValue change={change} />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ))}
           </div>

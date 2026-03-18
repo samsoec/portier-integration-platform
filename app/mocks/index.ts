@@ -76,12 +76,12 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       changes: [
         {
           id: "c1",
-          field_name: "email",
+          field_name: "User.email",
           change_type: "UPDATE",
           current_value: "old@example.com",
           new_value: "new@example.com",
         },
-        { id: "c2", field_name: "phone", change_type: "ADD", new_value: "+1234567890" },
+        { id: "c2", field_name: "User.phone", change_type: "ADD", new_value: "+1234567890" },
       ],
     },
     {
@@ -94,7 +94,7 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       changes: [
         {
           id: "c3",
-          field_name: "address",
+          field_name: "User.name",
           change_type: "UPDATE",
           current_value: "123 Old St",
           new_value: "456 New Ave",
@@ -113,17 +113,17 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       changes: [
         {
           id: "c4",
-          field_name: "plan",
+          field_name: "Key.key_type",
           change_type: "UPDATE",
           current_value: "free",
           new_value: "pro",
         },
         {
           id: "c5",
-          field_name: "seats",
+          field_name: "Key.status",
           change_type: "UPDATE",
-          current_value: "5",
-          new_value: "25",
+          current_value: "revoked",
+          new_value: "active",
         },
       ],
     },
@@ -139,12 +139,12 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       changes: [
         {
           id: "c6",
-          field_name: "inventory_count",
+          field_name: "Door.battery_level",
           change_type: "UPDATE",
           current_value: "100",
           new_value: "85",
         },
-        { id: "c7", field_name: "warehouse_id", change_type: "DELETE", current_value: "WH-003" },
+        { id: "c7", field_name: "Door.device_id", change_type: "DELETE", current_value: "WH-003" },
       ],
     },
     {
@@ -154,7 +154,7 @@ export const SYNC_HISTORY_DATA: Record<string, SyncHistoryEntry[]> = {
       version: "v0.9.3",
       status: "Success",
       summary: "Scheduled batch sync completed",
-      changes: [{ id: "c8", field_name: "sku", change_type: "ADD", new_value: "SKU-9921" }],
+      changes: [{ id: "c8", field_name: "Door.name", change_type: "ADD", new_value: "SKU-9921" }],
     },
   ],
   slack: [

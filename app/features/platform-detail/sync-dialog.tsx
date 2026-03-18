@@ -6,8 +6,9 @@ import type { BadgeProps } from "~/components/badge";
 import { getHttpErrorCode, isClientError, isServerError, type APIError } from "~/utils/error";
 import { ErrorState } from "~/components/error-state";
 import type { SyncChange, ChangeType } from "~/entities/types";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { cn } from "~/utils/classname";
+import { groupChangesByEntity, parseFieldName } from "~/utils/group-changes";
 
 const CHANGE_TYPE_BADGE: Record<ChangeType, BadgeProps["variant"]> = {
   UPDATE: "info",
@@ -118,6 +119,7 @@ export function SyncDialog({
 
   const allSelected = numberAccepted === platformChanges.length;
   const noneSelected = numberAccepted === 0;
+  const grouped = useMemo(() => groupChangesByEntity(platformChanges), [platformChanges]);
 
   return (
     <Dialog open title={`Review Changes — ${platformName}`} onClose={onClose} footer={footer}>
@@ -150,35 +152,50 @@ export function SyncDialog({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            {platformChanges.map((change) => {
-              const accepted = Object.hasOwn(acceptedChangeIds, change.id);
-              return (
-                <label
-                  key={change.id}
-                  className={cn(
-                    "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
-                    accepted ? "border-blue-200 bg-blue-50/50" : "border-gray-200 bg-gray-50/50"
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={accepted}
-                    onChange={() => handleToggleChange(change.id, change.new_value)}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                    <div className="flex items-center gap-2 justify-between">
-                      <code className="text-sm font-medium text-gray-900">{change.field_name}</code>
-                      <Badge variant={CHANGE_TYPE_BADGE[change.change_type]}>
-                        {change.change_type}
-                      </Badge>
-                    </div>
-                    <ChangeValue change={change} />
-                  </div>
-                </label>
-              );
-            })}
+          <div className="flex flex-col gap-4">
+            {grouped.map((group) => (
+              <div key={group.entity} className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+                    {group.entity}
+                  </h3>
+                  <p className="text-xs text-gray-500">{group.changes.length} changes conflict</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {group.changes.map((change) => {
+                    const accepted = Object.hasOwn(acceptedChangeIds, change.id);
+                    const { field } = parseFieldName(change.field_name);
+                    return (
+                      <label
+                        key={change.id}
+                        className={cn(
+                          "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
+                          accepted
+                            ? "border-blue-200 bg-blue-50/50"
+                            : "border-gray-200 bg-gray-50/50"
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={accepted}
+                          onChange={() => handleToggleChange(change.id, change.new_value)}
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                          <div className="flex items-center gap-2 justify-between">
+                            <code className="text-sm font-medium text-gray-900">{field}</code>
+                            <Badge variant={CHANGE_TYPE_BADGE[change.change_type]}>
+                              {change.change_type}
+                            </Badge>
+                          </div>
+                          <ChangeValue change={change} />
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
