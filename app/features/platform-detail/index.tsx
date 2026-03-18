@@ -6,6 +6,7 @@ import { ErrorState } from "~/components/error-state";
 import { Spinner } from "~/components/spinner";
 import type { Status } from "~/entities/types";
 import { SyncAction } from "./sync-action";
+import { SyncHistory } from "./sync-history";
 import { useFetchPlatform } from "~/api/fetch-platform";
 
 const STATUS_BADGE_MAP: Record<Status, BadgeProps["variant"]> = {
@@ -106,6 +107,13 @@ export function PlatformDetail({ id }: PlatformDetailProps) {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {data && (
+        <div className="mt-8 flex flex-1 flex-col gap-6 p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+          <h1 className="text-2xl font-semibold text-gray-900">Sync History</h1>
+          <SyncHistory platformId={id} />
         </div>
       )}
     </div>

@@ -4,6 +4,10 @@ export const StatusSchema = z.enum(["Synced", "Syncing", "Conflict", "Error"]);
 
 export const ChangeTypeSchema = z.enum(["UPDATE", "ADD", "DELETE"]);
 
+export const SyncSourceSchema = z.enum(["System", "External", "Manual"]);
+
+export const SyncStatusSchema = z.enum(["Success", "Conflict", "Failed"]);
+
 export const PlatformSchema = z.object({
   id: z.string(),
   avatar: z.string(),
@@ -49,4 +53,18 @@ export const SyncResponseSchema = z.object({
     sync_approval: SyncApprovalSchema,
     metadata: z.record(z.string(), z.unknown()),
   }),
+});
+
+export const SyncHistoryEntrySchema = z.object({
+  id: z.string(),
+  timestamp: z.iso.datetime(),
+  source: SyncSourceSchema,
+  version: z.string(),
+  status: SyncStatusSchema,
+  summary: z.string(),
+  changes: z.array(SyncChangeSchema),
+});
+
+export const FetchSyncHistoryResponseSchema = z.object({
+  data: z.array(SyncHistoryEntrySchema),
 });
