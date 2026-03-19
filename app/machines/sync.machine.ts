@@ -21,11 +21,6 @@ export const syncMachine = createMachine({
     events: {} as SyncEvent,
     services: {} as SyncService,
   },
-  context: {
-    changes: [],
-    acceptedChangeIds: [],
-    error: null,
-  },
   on: {
     CLOSE: { target: "idle" },
   },

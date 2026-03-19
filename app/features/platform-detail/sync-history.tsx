@@ -8,6 +8,7 @@ import { useFetchSyncHistory } from "~/api/fetch-sync-history";
 import { SyncDetailDialog } from "./sync-detail-dialog";
 import { EmptyState } from "~/components/empty-state";
 import type { SyncHistoryEntry, SyncStatus } from "~/entities/types";
+import { Button } from "~/components/ui/button";
 
 const STATUS_BADGE: Record<SyncStatus, BadgeProps["variant"]> = {
   Success: "success",
@@ -71,13 +72,15 @@ export function SyncHistory({ platformId }: SyncHistoryProps) {
               </Table.Cell>
               <Table.Cell className="text-sm">{entry.summary}</Table.Cell>
               <Table.Cell className="text-right">
-                <button
+                <Button
                   onClick={() => setSelectedEntry(entry)}
-                  className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+                  size="sm"
+                  variant="ghost"
+                  className="inline-flex items-center gap-1"
                 >
                   <EyeIcon size={14} />
                   View Changes
-                </button>
+                </Button>
               </Table.Cell>
             </Table.Row>
           ))}

@@ -64,7 +64,7 @@ export function SyncDialog({
   const handleToggleChange = (changeId: string, changeValue: unknown) => {
     setAcceptedChangeIds((prev) => {
       const newState = { ...prev };
-      if (Object.hasOwn(newState, changeId) && newState[changeId] === changeValue) {
+      if (Object.hasOwn(newState, changeId)) {
         delete newState[changeId];
       } else {
         newState[changeId] = changeValue;
