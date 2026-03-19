@@ -1,27 +1,28 @@
-# Welcome to React Router!
+# Integration Platform
 
-A modern, production-ready template for building full-stack React applications using React Router.
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+A frontend application for managing third-party platform integrations, built with React Router, TailwindCSS, TanStack Query, and XState.
 
 ## Features
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- Platform integration listing with status filtering and search
+- Platform detail view with sync history
+- Sync Now functionality (calls API)
+- Conflict resolution dialog for sync operations
+- All data (except Sync Now) is mocked/simulated locally
 
 ## Getting Started
+
+### Prerequisites
+
+- Node.js 20+
+- npm
 
 ### Installation
 
 Install the dependencies:
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ### Development
@@ -34,6 +35,12 @@ npm run dev
 
 Your application will be available at `http://localhost:5173`.
 
+### Running Tests
+
+```bash
+npm test
+```
+
 ## Building for Production
 
 Create a production build:
@@ -42,46 +49,72 @@ Create a production build:
 npm run build
 ```
 
-## Deployment
+## Docker Deployment
 
-### Docker Deployment
+### Prerequisites
 
-To build and run using Docker:
+- [Docker](https://docs.docker.com/get-docker/) installed
+
+### Build and Run
+
+1. **Build the Docker image:**
 
 ```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
+docker build -t integration-platform .
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
+2. **Run the container:**
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
+```bash
+docker run -p 3000:3000 integration-platform
 ```
 
-## Styling
+3. **Open the application:**
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
 
----
+### Stop the Container
 
-Built with ❤️ using React Router.
+```bash
+docker stop $(docker ps -q --filter ancestor=integration-platform)
+```
+
+## Project Structure
+
+```
+app/
+├── api/              # API layer (Sync Now calls the real API; other data is mocked)
+├── components/       # Reusable UI components
+├── entities/         # Schemas and types
+├── features/         # Feature modules (integration-list, platform-detail)
+├── machines/         # XState state machines (sync flow)
+├── mocks/            # Mock data
+├── providers/        # React context providers
+├── routes/           # Route components
+└── utils/            # Utility functions
+```
+
+## Tech Stack
+
+- **React 19** with **React Router 7** (SPA mode)
+- **TailwindCSS 4** for styling
+- **TanStack Query** for data fetching
+- **XState 4** for sync state management
+- **Zod** for schema validation
+- **Vitest** + **Testing Library** for testing
+
+## State Machine
+
+Try out our state machine in simulation mode:
+
+[Open in Stately](https://stately.ai/registry/editor/aee52c41-8cca-4059-b6ae-735448026c41?machineId=6dce9973-7cc2-4547-8600-00a38b75b670&mode=Design)
+
+**What is this?**
+
+This is a simulation of our state machine, built using [Stately](https://stately.ai/). You can interact with the machine by sending events and observing the resulting state changes.
+
+**How to use**
+
+1. Click on the simulation link above to open the Stately editor.
+2. Send events to the machine by clicking on the event buttons.
+3. Observe the resulting state changes in the state chart.
