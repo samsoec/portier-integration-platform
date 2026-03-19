@@ -2,9 +2,13 @@
 
 A frontend application for managing third-party platform integrations, built with React Router, TailwindCSS, TanStack Query, and XState.
 
+---
+
 ## Access the Live Demo
 
 Try out the live demo of the Integration Platform on Vercel: [https://integration-platform-samsoec.vercel.app/](https://integration-platform-samsoec.vercel.app/)
+
+---
 
 ## Features
 
@@ -13,6 +17,8 @@ Try out the live demo of the Integration Platform on Vercel: [https://integratio
 - Sync Now functionality (calls API)
 - Conflict resolution dialog for sync operations
 - All data (except Sync Now) is mocked/simulated locally
+
+---
 
 ## Getting Started
 
@@ -45,6 +51,8 @@ Your application will be available at `http://localhost:5173`.
 npm test
 ```
 
+---
+
 ## Building for Production
 
 Create a production build:
@@ -52,6 +60,8 @@ Create a production build:
 ```bash
 npm run build
 ```
+
+---
 
 ## Docker Deployment
 
@@ -83,6 +93,8 @@ Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
 docker stop $(docker ps -q --filter ancestor=integration-platform)
 ```
 
+---
+
 ## Project Structure
 
 ```
@@ -98,6 +110,8 @@ app/
 └── utils/            # Utility functions
 ```
 
+---
+
 ## Tech Stack
 
 - **React 19** with **React Router 7** (SPA mode)
@@ -107,10 +121,14 @@ app/
 - **Zod** for schema validation
 - **Vitest** + **Testing Library** for testing
 
+---
+
 ## Assumptions
 
 - **Only Sync Now calls a real API** - The sync operation calls the external endpoint (`https://portier-takehometest.onrender.com/api/v1/data/sync`). All other data (platform listing, platform detail, sync history) is mocked locally with simulated delays.
 - **Conflict detection** — A sync response is treated as a conflict when the platform status is `"Conflict"` and changes are present in the response.
+
+---
 
 ## Design Decisions
 
