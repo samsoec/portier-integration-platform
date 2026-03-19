@@ -109,15 +109,14 @@ app/
 
 ## Assumptions
 
-- **Only Sync Now calls a real API** — The sync operation calls the external endpoint (`https://portier-takehometest.onrender.com/api/v1/data/sync`). All other data (platform listing, platform detail, sync history) is mocked locally with simulated delays.
+- **Only Sync Now calls a real API** - The sync operation calls the external endpoint (`https://portier-takehometest.onrender.com/api/v1/data/sync`). All other data (platform listing, platform detail, sync history) is mocked locally with simulated delays.
 - **Conflict detection** — A sync response is treated as a conflict when the platform status is `"Conflict"` and changes are present in the response.
-- **All API responses are validated at runtime** — Zod schemas validate every response before it reaches the UI, catching contract violations early.
 
 ## Design Decisions
 
 ### XState for Sync Orchestration
 
-The sync flow has explicit multi-step states (idle → syncing → conflict resolution or change preview → submitting → success/error). A state machine makes these transitions explicit and prevents impossible states, rather than managing this complexity with scattered `useState` calls.
+A state machine makes these transitions explicit and prevents impossible states, rather than managing this complexity with scattered state calls.
 
 Try out our state machine in simulation mode:
 
@@ -135,8 +134,8 @@ This is a simulation of our state machine, built using [Stately](https://stately
 
 ### Zod for Schema Validation
 
-Schemas serve as the single source of truth: they define both runtime validation and TypeScript types (via `z.infer<>`). This ensures types always match validation rules and catches API contract violations at runtime.
+Zod schemas validate every response before it reaches the UI, catching contract violations early.
 
 ### TanStack Query for Data Fetching
 
-Provides centralized caching, request deduplication, and automatic refetching. Configured with a 1-minute stale time, 3 retries on failure, and window focus refetch disabled (since most data is mocked).
+Provides centralized caching, request deduplication, and automatic refetching.
