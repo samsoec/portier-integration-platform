@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { SyncAction } from "../sync-action";
 import { renderWithProviders } from "~/test-utils";
 import type { Platform } from "~/entities/types";
+import { useSyncPlatform } from "~/api/sync-platform";
+import { HttpError } from "~/utils/error";
 
 const mockMutateAsync = vi.fn();
 
@@ -85,5 +87,74 @@ describe("SyncAction", () => {
     await waitFor(() => {
       expect(screen.getByText("Syncing...")).toBeInTheDocument();
     });
+  });
+
+  it("shows error dialog when sync fails", async () => {
+    const syncError = new HttpError(500, "Internal Server Error");
+    mockMutateAsync.mockRejectedValue(syncError);
+    vi.mocked(useSyncPlatform).mockReturnValue({
+      data: undefined,
+      mutateAsync: mockMutateAsync,
+      error: syncError,
+    } as unknown as ReturnType<typeof useSyncPlatform>);
+    const user = userEvent.setup();
+
+    renderWithProviders(<SyncAction platform={syncedPlatform} />);
+    await user.click(screen.getByText("Sync"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Sync Failed")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Server Error")).toBeInTheDocument();
+    expect(screen.getByText("Retry")).toBeInTheDocument();
+  });
+
+  it("retries sync when Retry is clicked in error dialog", async () => {
+    const syncError = new HttpError(500, "Internal Server Error");
+    mockMutateAsync.mockRejectedValue(syncError);
+    vi.mocked(useSyncPlatform).mockReturnValue({
+      data: undefined,
+      mutateAsync: mockMutateAsync,
+      error: syncError,
+    } as unknown as ReturnType<typeof useSyncPlatform>);
+    const user = userEvent.setup();
+
+    renderWithProviders(<SyncAction platform={syncedPlatform} />);
+    await user.click(screen.getByText("Sync"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Retry")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Retry"));
+
+    // mutateAsync called twice: initial sync + retry
+    expect(mockMutateAsync).toHaveBeenCalledTimes(2);
+  });
+
+  it("returns to idle when Cancel is clicked in error dialog", async () => {
+    const syncError = new HttpError(500, "Internal Server Error");
+    mockMutateAsync.mockRejectedValue(syncError);
+    vi.mocked(useSyncPlatform).mockReturnValue({
+      data: undefined,
+      mutateAsync: mockMutateAsync,
+      error: syncError,
+    } as unknown as ReturnType<typeof useSyncPlatform>);
+    const user = userEvent.setup();
+
+    renderWithProviders(<SyncAction platform={syncedPlatform} />);
+    await user.click(screen.getByText("Sync"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Cancel")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Cancel"));
+
+    // Error dialog should be gone, back to idle with Sync button available
+    await waitFor(() => {
+      expect(screen.queryByText("Sync Failed")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText("Sync")).toBeInTheDocument();
   });
 });

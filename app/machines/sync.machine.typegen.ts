@@ -47,5 +47,5 @@ export interface Typegen0 {
         previewingChanges?: "selecting" | "submitting" | "success";
         previewingConflict?: "selecting" | "submitting" | "success";
       };
-  tags: "dialog:changes" | "dialog:conflict";
+  tags: never;
 }

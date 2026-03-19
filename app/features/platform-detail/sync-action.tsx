@@ -6,6 +6,7 @@ import { useMachine } from "@xstate/react";
 import { syncMachine } from "~/machines/sync.machine";
 import { useSyncPlatform } from "~/api/sync-platform";
 import { SyncConflictDialog } from "./sync-conflict-dialog";
+import { SyncErrorDialog } from "./sync-error-dialog";
 
 type SyncActionProps = {
   platform: Platform;
@@ -74,10 +75,8 @@ export function SyncAction({ platform }: SyncActionProps) {
           platformChanges={changes}
           isSubmitting={state.matches("previewingConflict.submitting")}
           isSubmitted={state.matches("previewingConflict.success")}
-          error={syncError || undefined}
           onClose={() => send({ type: "CLOSE" })}
           onSubmit={() => send({ type: "CONFIRM" })}
-          onRetry={() => send({ type: "RETRY", applicationId: platform.id })}
         />
       )}
 
@@ -87,9 +86,15 @@ export function SyncAction({ platform }: SyncActionProps) {
           platformChanges={changes}
           isSubmitting={state.matches("previewingChanges.submitting")}
           isSubmitted={state.matches("previewingChanges.success")}
-          error={syncError || undefined}
           onClose={() => send({ type: "CLOSE" })}
           onSubmit={() => send({ type: "CONFIRM" })}
+        />
+      )}
+
+      {state.matches("error") && (
+        <SyncErrorDialog
+          error={syncError!}
+          onClose={() => send({ type: "CLOSE" })}
           onRetry={() => send({ type: "RETRY", applicationId: platform.id })}
         />
       )}

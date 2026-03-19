@@ -3,8 +3,6 @@ import { Button } from "~/components/ui/button";
 import { Dialog } from "~/components/ui/dialog";
 import { Badge } from "~/components/badge";
 import type { BadgeProps } from "~/components/badge";
-import { getHttpErrorCode, isClientError, isServerError, type APIError } from "~/utils/error";
-import { ErrorState } from "~/components/error-state";
 import type { SyncChange, ChangeType } from "~/entities/types";
 import { useState, useMemo } from "react";
 import { cn } from "~/utils/classname";
@@ -21,40 +19,17 @@ type SyncDialogProps = {
   platformChanges: SyncChange[];
   isSubmitting: boolean;
   isSubmitted: boolean;
-  error?: APIError;
   onClose: () => void;
   onSubmit: (acceptedChangeIds: Record<string, unknown>) => void;
-  onRetry: () => void;
 };
-
-function getErrorTitle(error: APIError | undefined) {
-  if (!error) return "Sync Error";
-  if (isClientError(error)) return "Configuration Error";
-  if (isServerError(error)) return "Server Error";
-  if (getHttpErrorCode(error) === 502) return "Gateway Error";
-  return "Sync Error";
-}
-
-function getErrorDescription(error: APIError | undefined) {
-  if (!error) return "An unexpected error occurred. Please try again.";
-  if (isClientError(error))
-    return "Possible missing configuration. Please check your integration settings before syncing.";
-  if (isServerError(error))
-    return "Internal server error. The sync service is experiencing issues. Please try again later.";
-  if (getHttpErrorCode(error) === 502)
-    return "Gateway error. The integration client server appears to be down. Please contact support.";
-  return error.message || "An unexpected error occurred. Please try again.";
-}
 
 export function SyncDialog({
   platformName,
   platformChanges,
   isSubmitting = false,
   isSubmitted = false,
-  error,
   onClose,
   onSubmit,
-  onRetry,
 }: SyncDialogProps) {
   const [acceptedChangeIds, setAcceptedChangeIds] = useState<Record<string, unknown>>({});
 
@@ -90,9 +65,11 @@ export function SyncDialog({
 
   const footer = (
     <>
-      <Button variant="ghost" onClick={onClose}>
-        Cancel
-      </Button>
+      {!isSubmitted && (
+        <Button variant="ghost" onClick={onClose}>
+          Cancel
+        </Button>
+      )}
       {platformChanges.length > 0 && !isSubmitted && (
         <Button
           variant="solid"
@@ -107,11 +84,6 @@ export function SyncDialog({
       {isSubmitted && (
         <Button variant="solid" onClick={onClose}>
           Done
-        </Button>
-      )}
-      {error && !isSubmitted && (
-        <Button variant="solid" onClick={onRetry}>
-          Retry
         </Button>
       )}
     </>
@@ -208,14 +180,6 @@ export function SyncDialog({
           <p className="text-lg font-semibold text-gray-900">Sync completed successfully!</p>
           <p className="text-sm text-gray-500">{numberAccepted} changes have been applied.</p>
         </div>
-      )}
-
-      {error && (
-        <ErrorState
-          className="py-4"
-          title={getErrorTitle(error)}
-          message={getErrorDescription(error)}
-        />
       )}
     </Dialog>
   );

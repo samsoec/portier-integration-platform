@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event";
 import { SyncDialog } from "../sync-dialog";
 import { renderWithProviders } from "~/test-utils";
 import type { SyncChange } from "~/entities/types";
-import { HttpError } from "~/utils/error";
 
 const changes: SyncChange[] = [
   {
@@ -35,7 +34,6 @@ const defaultProps = {
   isSubmitted: false,
   onClose: vi.fn(),
   onSubmit: vi.fn(),
-  onRetry: vi.fn(),
 };
 
 describe("SyncDialog", () => {
@@ -139,37 +137,5 @@ describe("SyncDialog", () => {
 
     expect(screen.getByText("Sync completed successfully!")).toBeInTheDocument();
     expect(screen.getByText("Done")).toBeInTheDocument();
-  });
-
-  it("shows Configuration Error for client errors", () => {
-    const error = new HttpError(400, "Bad Request");
-    renderWithProviders(<SyncDialog {...defaultProps} error={error} />);
-
-    expect(screen.getByText("Configuration Error")).toBeInTheDocument();
-  });
-
-  it("shows Server Error for 5xx errors", () => {
-    const error = new HttpError(500, "Internal Server Error");
-    renderWithProviders(<SyncDialog {...defaultProps} error={error} />);
-
-    expect(screen.getByText("Server Error")).toBeInTheDocument();
-  });
-
-  it("shows Retry button when there is an error", () => {
-    const error = new HttpError(500, "err");
-    renderWithProviders(<SyncDialog {...defaultProps} error={error} />);
-
-    expect(screen.getByText("Retry")).toBeInTheDocument();
-  });
-
-  it("calls onRetry when Retry button is clicked", async () => {
-    const onRetry = vi.fn();
-    const error = new HttpError(500, "err");
-    const user = userEvent.setup();
-
-    renderWithProviders(<SyncDialog {...defaultProps} error={error} onRetry={onRetry} />);
-    await user.click(screen.getByText("Retry"));
-
-    expect(onRetry).toHaveBeenCalledOnce();
   });
 });

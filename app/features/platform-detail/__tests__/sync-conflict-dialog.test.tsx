@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event";
 import { SyncConflictDialog } from "../sync-conflict-dialog";
 import { renderWithProviders } from "~/test-utils";
 import type { SyncChange } from "~/entities/types";
-import { HttpError } from "~/utils/error";
 
 const changes: SyncChange[] = [
   {
@@ -30,7 +29,6 @@ const defaultProps = {
   isSubmitted: false,
   onClose: vi.fn(),
   onSubmit: vi.fn(),
-  onRetry: vi.fn(),
 };
 
 describe("SyncConflictDialog", () => {
@@ -137,24 +135,6 @@ describe("SyncConflictDialog", () => {
 
     expect(screen.getByText("Conflicts resolved successfully!")).toBeInTheDocument();
     expect(screen.getByText("Done")).toBeInTheDocument();
-  });
-
-  it("shows error state for server errors", () => {
-    const error = new HttpError(500, "Internal Server Error");
-    renderWithProviders(<SyncConflictDialog {...defaultProps} error={error} />);
-
-    expect(screen.getByText("Server Error")).toBeInTheDocument();
-  });
-
-  it("shows Retry button on error", async () => {
-    const onRetry = vi.fn();
-    const error = new HttpError(500, "err");
-    const user = userEvent.setup();
-
-    renderWithProviders(<SyncConflictDialog {...defaultProps} error={error} onRetry={onRetry} />);
-    await user.click(screen.getByText("Retry"));
-
-    expect(onRetry).toHaveBeenCalledOnce();
   });
 
   it("calls onClose when Cancel is clicked", async () => {

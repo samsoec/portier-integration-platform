@@ -86,7 +86,6 @@ export const syncMachine = createMachine({
       },
     },
     error: {
-      tags: ["dialog:changes", "dialog:conflict"],
       on: {
         RETRY: "syncing",
       },
