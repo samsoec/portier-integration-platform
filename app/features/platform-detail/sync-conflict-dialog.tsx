@@ -1,18 +1,16 @@
-import { Check, CheckCircleIcon, Circle, RefreshCw } from "lucide-react";
+import { CheckCircleIcon, RefreshCw } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Dialog } from "~/components/ui/dialog";
-import { Badge } from "~/components/badge";
-import type { BadgeProps } from "~/components/badge";
-import type { SyncChange, ChangeType } from "~/entities/types";
-import { useState, useMemo } from "react";
+import type { SyncChange } from "~/entities/types";
+import { useState, useMemo, useCallback } from "react";
 import { cn } from "~/utils/classname";
 import { groupChangesByEntity, parseFieldName } from "~/utils/group-changes";
-
-const CHANGE_TYPE_BADGE: Record<ChangeType, BadgeProps["variant"]> = {
-  UPDATE: "info",
-  ADD: "success",
-  DELETE: "error",
-};
+import {
+  validateRequiredFields,
+  isRequiredField,
+  type ResolvedChange,
+} from "~/utils/conflict-resolution";
+import { SyncConflictField } from "./sync-conflict-field";
 
 type SyncConflictDialogProps = {
   platformName: string;
@@ -20,7 +18,7 @@ type SyncConflictDialogProps = {
   isSubmitting: boolean;
   isSubmitted: boolean;
   onClose: () => void;
-  onSubmit: (acceptedChangeIds: Record<string, unknown>) => void;
+  onSubmit: (acceptedChangeIds: Record<string, ResolvedChange>) => void;
 };
 
 export function SyncConflictDialog({
@@ -31,26 +29,39 @@ export function SyncConflictDialog({
   onClose,
   onSubmit,
 }: SyncConflictDialogProps) {
-  const [acceptedChangeIds, setAcceptedChangeIds] = useState<Record<string, unknown>>({});
+  const [acceptedChangeIds, setAcceptedChangeIds] = useState<Record<string, ResolvedChange>>({});
 
   const numberAccepted = Object.keys(acceptedChangeIds).length;
   const isAllReviewed = platformChanges.length > 0 && numberAccepted === platformChanges.length;
 
-  const handleSelect = (changeId: string, changeValue: unknown) => {
-    setAcceptedChangeIds((prev) => {
-      const newState = { ...prev };
-      newState[changeId] = changeValue;
-      return newState;
-    });
-  };
+  const validation = useMemo(
+    () => validateRequiredFields(acceptedChangeIds, platformChanges),
+    [acceptedChangeIds, platformChanges]
+  );
+
+  const canConfirm = isAllReviewed && validation.valid;
+
+  const handleSelect = useCallback(
+    (changeId: string, changeValue: unknown, valueType: "current" | "new" | "custom") => {
+      setAcceptedChangeIds((prev) => {
+        if (changeValue === undefined) {
+          const newState = { ...prev };
+          delete newState[changeId];
+          return newState;
+        }
+        return { ...prev, [changeId]: { type: valueType, value: changeValue } };
+      });
+    },
+    []
+  );
 
   const handleAcceptAllNew = () => {
     const newAccepted = platformChanges.reduce(
       (acc, change) => {
-        acc[change.id] = change.new_value;
+        acc[change.id] = { type: "new", value: change.new_value };
         return acc;
       },
-      {} as Record<string, unknown>
+      {} as Record<string, ResolvedChange>
     );
     setAcceptedChangeIds(newAccepted);
   };
@@ -58,10 +69,10 @@ export function SyncConflictDialog({
   const handleKeepAllCurrent = () => {
     const newAccepted = platformChanges.reduce(
       (acc, change) => {
-        acc[change.id] = change.current_value;
+        acc[change.id] = { type: "current", value: change.current_value };
         return acc;
       },
-      {} as Record<string, unknown>
+      {} as Record<string, ResolvedChange>
     );
     setAcceptedChangeIds(newAccepted);
   };
@@ -71,14 +82,14 @@ export function SyncConflictDialog({
     platformChanges.every(
       (change) =>
         Object.hasOwn(acceptedChangeIds, change.id) &&
-        acceptedChangeIds[change.id] === change.new_value
+        acceptedChangeIds[change.id].value === change.new_value
     );
   const allCurrentSelected =
     platformChanges.length > 0 &&
     platformChanges.every(
       (change) =>
         Object.hasOwn(acceptedChangeIds, change.id) &&
-        acceptedChangeIds[change.id] === change.current_value
+        acceptedChangeIds[change.id].value === change.current_value
     );
 
   const grouped = useMemo(() => groupChangesByEntity(platformChanges), [platformChanges]);
@@ -93,7 +104,7 @@ export function SyncConflictDialog({
       {platformChanges.length > 0 && !isSubmitted && (
         <Button
           variant="solid"
-          disabled={!isAllReviewed || isSubmitting}
+          disabled={!canConfirm || isSubmitting}
           onClick={() => onSubmit(acceptedChangeIds)}
           className="flex items-center gap-1.5"
         >
@@ -141,7 +152,7 @@ export function SyncConflictDialog({
           </div>
 
           <p className="text-xs text-gray-400">
-            Click on the value you want to keep for each field.
+            Click on the value you want to keep for each field, or enter a custom value.
           </p>
 
           <div className="flex flex-col gap-5">
@@ -153,111 +164,19 @@ export function SyncConflictDialog({
                   </h3>
                   <p className="text-xs text-gray-500">{group.changes.length} changes conflict</p>
                 </div>
-                {group.changes.map((change) => {
-                  const acceptedNew =
-                    Object.hasOwn(acceptedChangeIds, change.id) &&
-                    acceptedChangeIds[change.id] === change.new_value;
-                  const acceptedCurrent =
-                    Object.hasOwn(acceptedChangeIds, change.id) &&
-                    acceptedChangeIds[change.id] === change.current_value;
-                  const hasSelection = acceptedNew || acceptedCurrent;
-                  const { field } = parseFieldName(change.field_name);
-                  return (
-                    <div key={change.id} className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2 justify-between">
-                        <div className="flex items-center gap-2">
-                          {hasSelection ? (
-                            <Check size={14} className="text-green-500" />
-                          ) : (
-                            <Circle size={14} className="text-gray-300" />
-                          )}
-                          <code className="text-sm font-medium text-gray-900">{field}</code>
-                        </div>
-                        <Badge variant={CHANGE_TYPE_BADGE[change.change_type]}>
-                          {change.change_type}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleSelect(change.id, change.current_value)}
-                          className={cn(
-                            "relative flex flex-col gap-1 rounded-lg border p-3 text-left transition-all",
-                            acceptedCurrent
-                              ? "border-blue-400 bg-blue-50 ring-1 ring-blue-400 shadow-sm"
-                              : hasSelection
-                                ? "border-gray-200 bg-gray-50/30 opacity-50 hover:opacity-80 hover:border-blue-300"
-                                : "border-gray-200 bg-gray-50/50 hover:border-blue-300 hover:bg-blue-50/30"
-                          )}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span
-                              className={cn(
-                                "text-xs font-semibold uppercase tracking-wide",
-                                acceptedCurrent ? "text-blue-600" : "text-gray-400"
-                              )}
-                            >
-                              Current
-                            </span>
-                            {acceptedCurrent && (
-                              <span className="flex items-center gap-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
-                                <Check size={10} />
-                                Keeping
-                              </span>
-                            )}
-                          </div>
-                          <span
-                            className={cn(
-                              "text-sm",
-                              acceptedCurrent ? "font-medium text-gray-900" : "text-gray-700"
-                            )}
-                          >
-                            {change.current_value ?? (
-                              <span className="italic text-gray-400">—</span>
-                            )}
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleSelect(change.id, change.new_value)}
-                          className={cn(
-                            "relative flex flex-col gap-1 rounded-lg border p-3 text-left transition-all",
-                            acceptedNew
-                              ? "border-violet-400 bg-violet-50 ring-1 ring-violet-400 shadow-sm"
-                              : hasSelection
-                                ? "border-gray-200 bg-gray-50/30 opacity-50 hover:opacity-80 hover:border-violet-300"
-                                : "border-gray-200 bg-gray-50/50 hover:border-violet-300 hover:bg-violet-50/30"
-                          )}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span
-                              className={cn(
-                                "text-xs font-semibold uppercase tracking-wide",
-                                acceptedNew ? "text-violet-600" : "text-gray-400"
-                              )}
-                            >
-                              New
-                            </span>
-                            {acceptedNew && (
-                              <span className="flex items-center gap-1 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-700">
-                                <Check size={10} />
-                                Accepting
-                              </span>
-                            )}
-                          </div>
-                          <span
-                            className={cn(
-                              "text-sm",
-                              acceptedNew ? "font-medium text-gray-900" : "text-gray-700"
-                            )}
-                          >
-                            {change.new_value ?? <span className="italic text-gray-400">—</span>}
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+                {group.changes.map((change) => (
+                  <SyncConflictField
+                    key={change.id}
+                    name={change.id}
+                    label={parseFieldName(change.field_name).field}
+                    change={change}
+                    value={acceptedChangeIds[change.id]?.value}
+                    valueType={acceptedChangeIds[change.id]?.type}
+                    onChange={handleSelect}
+                    errorMessage={validation.fieldErrors[change.id]}
+                    required={isRequiredField(change.field_name)}
+                  />
+                ))}
               </div>
             ))}
           </div>
