@@ -25,6 +25,7 @@ export function Badge({ variant, icon, children, className }: BadgeProps) {
         STATUS_STYLES[variant],
         className
       )}
+      data-testid="status-badge"
     >
       {icon && <span className="mr-1">{icon}</span>}
       {children}

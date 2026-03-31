@@ -22,6 +22,7 @@ export function EmptyState({
         "flex flex-col items-center justify-center gap-3 rounded-md border border-dashed border-gray-200 bg-gray-50 px-6 py-16 text-center",
         className
       )}
+      data-testid="empty-state"
     >
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-400">
         {icon ?? <Inbox size={24} />}
