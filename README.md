@@ -6,7 +6,7 @@ A frontend application for managing third-party platform integrations, built wit
 
 ## Access the Live Demo
 
-Try out the live demo of the Integration Platform on Vercel: [https://integration-platform-samsoec.vercel.app/](https://integration-platform-samsoec.vercel.app/)
+Try out the live demo of the Integration Platform on Vercel: [https://portier-integration-platform.vercel.app/](https://portier-integration-platform.vercel.app/)
 
 ---
 
