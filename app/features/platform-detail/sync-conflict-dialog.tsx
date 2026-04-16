@@ -43,6 +43,7 @@ export function SyncConflictDialog({
 
   const handleSelect = useCallback(
     (changeId: string, changeValue: unknown, valueType: "current" | "new" | "custom") => {
+      console.log("Selected change:", changeId, changeValue, valueType);
       setAcceptedChangeIds((prev) => {
         if (changeValue === undefined) {
           const newState = { ...prev };
@@ -58,7 +59,9 @@ export function SyncConflictDialog({
   const handleAcceptAllNew = () => {
     const newAccepted = platformChanges.reduce(
       (acc, change) => {
-        acc[change.id] = { type: "new", value: change.new_value };
+        if (change.new_value) {
+          acc[change.id] = { type: "new", value: change.new_value };
+        }
         return acc;
       },
       {} as Record<string, ResolvedChange>
@@ -69,7 +72,9 @@ export function SyncConflictDialog({
   const handleKeepAllCurrent = () => {
     const newAccepted = platformChanges.reduce(
       (acc, change) => {
-        acc[change.id] = { type: "current", value: change.current_value };
+        if (change.current_value) {
+          acc[change.id] = { type: "current", value: change.current_value };
+        }
         return acc;
       },
       {} as Record<string, ResolvedChange>
